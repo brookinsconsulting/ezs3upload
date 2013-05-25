@@ -1,0 +1,2 @@
+{* $attribute.data_text|wash( xhtml ) *}
+{if $attribute.content}<a href={concat( 'http://', ezini( 'S3Settings', 'Bucket', 's3.ini' ),'.s3.amazonaws.com/', $attribute.content )|ezurl}>{$attribute.content|wash( xhtml )}</a>{/if}

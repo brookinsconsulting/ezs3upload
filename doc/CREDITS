@@ -1,0 +1,9 @@
+CREDITS
+=======
+
+Primary datatype extension development by Brookins Consulting funded by Think Creative
+
+Based on example implementation 'Working Amazon S3 Direct Upload Working Example' by samueleast.co.uk,
+http://www.isimpledesign.co.uk/blog/working-amazon-s3-direct-upload-working-example
+
+Extension provides swfupload: https://code.google.com/p/swfupload/

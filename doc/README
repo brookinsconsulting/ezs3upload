@@ -1,0 +1,129 @@
+eZ S3 Upload Client extension README
+
+What is the eZ S3 Upload Client extension?
+================================
+
+eZ S3 Upload Client is a true eZ Publish extension
+that provides a simple datatype to upload files
+directly from a client web browser to
+Amazon's S3 File Hosting Service
+
+
+eZ S3 Upload Client version
+=======================
+
+The current version of eZ S3 Upload Client is 0.2.7
+Last Major update: May 21, 2013
+
+
+Copyright
+=========
+
+eZ S3 Upload Client is copyright 1999 - 2014 Brookins Consulting and Think Creative
+
+See: doc/COPYRIGHT for more information on the terms of the copyright and license
+
+
+License
+=======
+
+eZ S3 Upload Client is licensed under the GNU General Public License.
+
+The complete license agreement is included in the doc/LICENSE file.
+
+eZ S3 Upload Client is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+eZ S3 Upload Client is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+The GNU GPL gives you the right to use, modify and redistribute
+eZ S3 Upload Client under certain conditions. The GNU GPL license
+is distributed with the software, see the file doc/LICENSE.
+
+It is also available at http://www.gnu.org/licenses/gpl.txt
+
+You should have received a copy of the GNU General Public License
+along with eZ S3 Upload Client in doc/LICENSE.  If not, see http://www.gnu.org/licenses/.
+
+Using eZ S3 Upload Client under the terms of the GNU GPL is free (as in freedom).
+
+For more information or questions please contact
+license@brookinsconsulting.com
+
+
+Requirements
+============
+
+The following requirements exists for using eZ S3 Upload Client extension:
+
+o  eZ Publish version:
+
+   Make sure you use eZ Publish version 4.x (required) or higher. eZ Publish 4.6.x+ (Community Build, 2011.11+) is recommended.
+
+o  PHP version:
+
+   Make sure you have PHP 5.x or higher.
+
+o  eZ JsCore:
+
+   Make sure you have ezjscore installed. ezjscore is required in ezs3upload.tpl template to load css and javascript dependencies.
+
+
+Features
+============
+
+- Dattype is simple by design
+
+- Datatype is based on ezstring
+
+- Datatype stores only one file name without http host or path information making bucket migrations a simple as changing the bucket settings
+
+- Bucket and Keys are stored as ini settings
+
+- Datatype can upload more than one file
+
+- Upload feature is not required; you can upload files by other methods and simply enter the filename into the content object attribute
+
+
+Usage
+============
+
+- Make sure you have all the requirements (listed above).
+
+- Unpack and Install extension.
+
+- Configure s3.ini.append.php settings: Key, SecretKey, Bucket
+
+- Add datatype to content class.
+
+- Upload crossdomain.xml into the doc root of your "S3 Bucket" using the "S3 Management Console". File is located in ezs3upload/doc/install folder.
+
+- Edit a content object and upload (image) files to S3 directly from ezp administration GUI.
+
+- Note: Only the filename is stored within the content object attribute -not- the full url to the bucket and file. This makes future migrations much simpler to update simply change the bucket name setting.
+
+- Note: You can upload as many files as you want without storing the content object.
+
+- Remember: Only the last file uploaded is stored within the content object attribute when the draft is stored or published.
+
+
+Troubleshooting
+===============
+
+1. Read the FAQ
+   ------------
+
+   Some problems are more common than others. The most common ones
+   are listed in the the doc/FAQ.
+
+2. Support
+   -------
+
+   If you have find any problems not handled by this document or the FAQ you
+   can contact Brookins Consulting through the support system:
+   http://brookinsconsulting.com/contact
