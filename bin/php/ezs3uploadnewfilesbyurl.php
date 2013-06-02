@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 /**
- * File containing the ezs3uploadfilesbyurl.php bin script
+ * File containing the ezs3uploadnewfilesbyurl.php bin script
  *
  * @copyright Copyright (C) 1999 - 2014 Brookins Consulting. All rights reserved.
  * @copyright Copyright (C) 2013 - 2014 Think Creative. All rights reserved.
@@ -18,7 +18,7 @@ require 'extension/ezs3upload/classes/ezs3upload.php';
 $cli = eZCLI::instance();
 $script = eZScript::instance( array( 'description' => ( "eZ Publish Upload Remote Files to Amazon S3 Script\n" .
                                                         "\n" .
-                                                        "ezs3uploadfilesbyurl.php --subdirectory=upload/ --permissions=readwrite --storage-dir=var/import/ --removetempfile --verbose" ),
+                                                        "ezs3uploadnewfilesbyurl.php --subdirectory=upload/ --permissions=readwrite --storage-dir=var/import/ --removetempfile --verbose" ),
                                      'use-session' => false,
                                      'use-modules' => true,
                                      'use-extensions' => true,
