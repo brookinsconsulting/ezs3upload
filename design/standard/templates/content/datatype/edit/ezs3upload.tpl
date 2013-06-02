@@ -298,7 +298,7 @@ function updateDisplay(swfu,file) {
                     <td>
                         <div>
                             <div>
-                                <div id="swfupload-control" style="display:inline; position: relative; top: -8px;"><input type="button" id="mybutton" />&nbsp;&nbsp;</div><div id="fsUploadProgress2" style="display:inline; position: relative; top: -8px;"></div><input type="text" id="txtFileName" disabled="true" style="display:inline; position: relative; top: -8px; border: solid 1px; background-color: #FFFFFF;" />&nbsp;<input type="submit" value="Upload" id="btnSubmit" style="position: relative; top: -8px; font-weight: bold; font-size: 4.9em" />
+                                <div id="swfupload-control" style="display:inline; position: relative; top: -8px;"><input type="button" id="mybutton" />&nbsp;&nbsp;</div><div id="fsUploadProgress2" style="display:inline; position: relative; top: -19px;"></div><input type="text" id="txtFileName" disabled="true" style="display:inline; position: relative; top: -19px; border: solid 1px; background-color: #FFFFFF;" />&nbsp;<input type="submit" value="Upload" id="btnSubmit" style="position: relative; top: -14px; font-weight: bold; font-size: 2.0em" />
                             </div>
                                 {* <!-- This is the container that the upload progress elements will be added to --> *}
 

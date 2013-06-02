@@ -6,7 +6,7 @@
 //
 // ## BEGIN COPYRIGHT, LICENSE AND WARRANTY NOTICE ##
 // SOFTWARE NAME: eZ S3 Upload Client
-// SOFTWARE RELEASE: 0.4.1
+// SOFTWARE RELEASE: 0.4.2
 // COPYRIGHT NOTICE: Copyright (C) 1999 - 2014 Brookins Consulting and ThinkCreative
 // SOFTWARE LICENSE: GNU General Public License v2.0 (or later)
 // NOTICE: >

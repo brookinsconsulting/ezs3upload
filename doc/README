@@ -12,7 +12,7 @@ Amazon's S3 File Hosting Service
 eZ S3 Upload Client version
 =======================
 
-The current version of eZ S3 Upload Client is 0.4.1
+The current version of eZ S3 Upload Client is 0.4.2
 Last Major update: June 1, 2013
 
 
@@ -126,13 +126,13 @@ Usage of command line scripts
 
 - Note: Only the filename is stored within the content object attribute -not- the full url to the bucket and file. This makes future migrations much simpler to update simply change the bucket name setting.
 
-- Example of upload remote file: ./extension/ezs3upload/bin/php/ezs3uploadfilebyurl.php --subdirectory=upload/ --url=http://tc/var/cdev_base/storage/images/media/test-image-001/100076-3-eng-GB/test-image-001_large.jpg --nodeid=5160 --permissions=read --storage-dir=var/import/ --removetempfile
-
 - Example of upload local file: ./extension/ezs3upload/bin/php/ezs3uploadfile.php --subdirectory=upload/ --file=var/cdev_base/storage/images/media/test-image-001/100076-3-eng-GB/test-image-001_reference.jpg --nodeid=5160 --permissions=read
 
-- Example of the upload remote new files and create new s3_file content objects: ./extension/ezs3upload/bin/php/ezs3uploadnewfilesbyurl.php --subdirectory=upload/ --permissions=read --storage-dir=var/import/ --removetempfile
+- Example of upload remote file: ./extension/ezs3upload/bin/php/ezs3uploadfilebyurl.php --subdirectory=upload/ --url=http://tc/var/cdev_base/storage/images/media/test-image-001/100076-3-eng-GB/test-image-001_large.jpg --nodeid=5160 --permissions=read --storage-dir=var/import/ --removetempfile
 
 - Example of the upload remote new files and update existing file content objects: ./extension/ezs3upload/bin/php/ezs3uploadfilesbyurl.php --subdirectory=upload/ --permissions=read --storage-dir=var/import/ --removetempfile
+
+- Example of the upload remote new files and create new s3_file content objects: ./extension/ezs3upload/bin/php/ezs3uploadnewfilesbyurl.php --subdirectory=upload/ --permissions=read --storage-dir=var/import/ --removetempfile
 
 
 Troubleshooting
