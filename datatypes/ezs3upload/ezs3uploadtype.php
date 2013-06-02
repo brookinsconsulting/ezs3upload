@@ -6,7 +6,7 @@
 //
 // ## BEGIN COPYRIGHT, LICENSE AND WARRANTY NOTICE ##
 // SOFTWARE NAME: eZ S3 Upload Client
-// SOFTWARE RELEASE: 0.2.7
+// SOFTWARE RELEASE: 0.4.1
 // COPYRIGHT NOTICE: Copyright (C) 1999 - 2014 Brookins Consulting and ThinkCreative
 // SOFTWARE LICENSE: GNU General Public License v2.0 (or later)
 // NOTICE: >
@@ -35,6 +35,8 @@
 class ezs3uploadType extends eZDataType
 {
     const DATA_TYPE_STRING = 'ezs3upload';
+    const DEFAULT_STRING_FIELD = "data_text1";
+    const DEFAULT_STRING_VARIABLE = "_ezstring_default_value_";
 
     /*!
      Construction of the class, note that the second parameter in eZDataType
@@ -42,7 +44,69 @@ class ezs3uploadType extends eZDataType
     */
     function __construct()
     {
-        parent::__construct( self::DATA_TYPE_STRING, 'Amazon S3 Upload Client' );
+        parent::__construct( self::DATA_TYPE_STRING, ezpI18n::tr( 'kernel/classes/datatypes', 'Amazon S3 Upload Client', 'Datatype name' ),
+                             array( 'serialize_supported' => true,
+                                    'object_serialize_map' => array( 'data_text' => 'text' ) ) );
+    }
+
+    /*!
+     Sets the default value.
+    */
+    function initializeObjectAttribute( $contentObjectAttribute, $currentVersion, $originalContentObjectAttribute )
+    {
+        if ( $currentVersion != false )
+        {
+//             $contentObjectAttributeID = $contentObjectAttribute->attribute( "id" );
+//             $currentObjectAttribute = eZContentObjectAttribute::fetch( $contentObjectAttributeID,
+//                                                                         $currentVersion );
+            $dataText = $originalContentObjectAttribute->attribute( "data_text" );
+            $contentObjectAttribute->setAttribute( "data_text", $dataText );
+        }
+        else
+        {
+            $contentClassAttribute = $contentObjectAttribute->contentClassAttribute();
+            $default = $contentClassAttribute->attribute( 'data_text1' );
+            if ( $default !== '' && $default !== NULL )
+            {
+                $contentObjectAttribute->setAttribute( 'data_text', $default );
+            }
+        }
+    }
+
+    /*!
+     Fetches the http post variables for collected information
+    */
+    function fetchCollectionAttributeHTTPInput( $collection, $collectionAttribute, $http, $base, $contentObjectAttribute )
+    {
+        if ( $http->hasPostVariable( $base . "_ezstring_data_text_" . $contentObjectAttribute->attribute( "id" ) ) )
+        {
+            $dataText = $http->postVariable( $base . "_ezstring_data_text_" . $contentObjectAttribute->attribute( "id" ) );
+            $collectionAttribute->setAttribute( 'data_text', $dataText );
+            return true;
+        }
+        return false;
+    }
+
+    /*!
+     Simple string insertion is supported.
+    */
+    function isSimpleStringInsertionSupported()
+    {
+        return true;
+    }
+
+    /*!
+     Inserts the string \a $string in the \c 'data_text' database field.
+    */
+    function insertSimpleString( $object, $objectVersion, $objectLanguage,
+                                 $objectAttribute, $string,
+                                 &$result )
+    {
+        $result = array( 'errors' => array(),
+                         'require_storage' => true );
+        $objectAttribute->setContent( $string );
+        $objectAttribute->setAttribute( 'data_text', $string );
+        return true;
     }
 
     /*!
@@ -83,13 +147,26 @@ class ezs3uploadType extends eZDataType
     {
         return $contentObjectAttribute->attribute( 'data_text' );
     }
+    /*!
+     \return string representation of an contentobjectattribute data for simplified export
+
+    */
+    function toString( $contentObjectAttribute )
+    {
+        return $contentObjectAttribute->attribute( 'data_text' );
+    }
+
+    function fromString( $contentObjectAttribute, $string )
+    {
+        return $contentObjectAttribute->setAttribute( 'data_text', $string );
+    }
 
     /*!
      Returns the text.
     */
     function title( $objectAttribute, $name = null)
     {
-        return $this->metaData( $objectAttribute );
+        return $contentObjectAttribute->attribute( 'data_text' );
     }
 
     function isIndexable()
@@ -97,9 +174,16 @@ class ezs3uploadType extends eZDataType
         return true;
     }
 
-    function sortKey( $objectAttribute )
+    function isInformationCollector()
     {
-        return $this->metaData( $objectAttribute );
+        // datatype missing basic ezstring info colector bits in datatype
+        return false;
+    }
+
+    function sortKey( $contentObjectAttribute )
+    {
+        $trans = eZCharTransform::instance();
+        return $trans->transformByGroup( $contentObjectAttribute->attribute( 'data_text' ), 'lowercase' );
     }
 
     function sortKeyType()
@@ -110,6 +194,35 @@ class ezs3uploadType extends eZDataType
     function hasObjectAttributeContent( $contentObjectAttribute )
     {
         return trim( $contentObjectAttribute->attribute( 'data_text' ) ) != '';
+    }
+
+    function diff( $old, $new, $options = false )
+    {
+        $diff = new eZDiff();
+        $diff->setDiffEngineType( $diff->engineType( 'text' ) );
+        $diff->initDiffEngine();
+        $diffObject = $diff->diff( $old->content(), $new->content() );
+        return $diffObject;
+    }
+
+    function supportsBatchInitializeObjectAttribute()
+    {
+        return true;
+    }
+
+    function batchInitializeObjectAttributeData( $classAttribute )
+    {
+        $default = $classAttribute->attribute( 'data_text1' );
+        if ( $default !== '' && $default !== NULL )
+        {
+            $db = eZDB::instance();
+            $default = "'" . $db->escapeString( $default ) . "'";
+            $trans = eZCharTransform::instance();
+            $lowerCasedDefault = $trans->transformByGroup( $default, 'lowercase' );
+            return array( 'data_text' => $default, 'sort_key_string' => $lowerCasedDefault );
+        }
+
+        return array();
     }
 
     /*!
