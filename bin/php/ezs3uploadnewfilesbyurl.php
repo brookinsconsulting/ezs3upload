@@ -99,9 +99,9 @@ else
 
 /** Files and related NodeIDs **/
 
-$urlsAndNodes = array( 'http://tc/var/cdev_base/storage/images/media/test-image-001/100076-3-eng-GB/test-image-001_large.jpg' => true,
-                       'http://tc/var/cdev_base/storage/images/media/test-image-001/100076-3-eng-GB/test-image-001_medium.jpg' => false,
-                       'http://tc/var/cdev_base/storage/images/media/test-image-001/100076-3-eng-GB/test-image-001.jpg' => true );
+$urlsAndNodes = array( 'http://tc/var/ezdemo_site/storage/images/media/s3-files/test-image-001/357449-1-eng-US/Test-Image-001_large.jpg' => true,
+                       'http://tc/var/ezdemo_site/storage/images/media/s3-files/test-image-001/357449-1-eng-US/Test-Image-001_reference.jpg' => true,
+                       'http://tc/var/ezdemo_site/storage/images/media/s3-files/test-image-001/357449-1-eng-US/Test-Image-001_small.jpg' => true );
 $urlsAndNodesCount = count( $urlsAndNodes );
 
 /** Setup script iteration details **/
@@ -110,6 +110,7 @@ $script->setIterationData( '.', '.' );
 $script->resetIteration( $urlsAndNodesCount );
 
 $upload = new eZS3Upload( $awsAccessKey, $awsSecretKey );
+// $upload->setParentNodeID( 19724 );
 
 /** Iterate over urls and nodes **/
 

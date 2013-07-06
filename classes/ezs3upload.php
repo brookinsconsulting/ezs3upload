@@ -15,6 +15,9 @@ class eZS3Upload
 {
     private static $__accessKey; // AWS Access key
     private static $__secretKey; // AWS Secret key
+    public static $creatorID = 14; // eZ Publish content object owner content ObjectID
+    public static $classIdentifier = 's3_file'; // eZ Publish content class identifier class name
+    public static $parentNodeID = 2; //eZ Publish content tree parent NodeID
 
     /**
     * Constructor - if you're not using the class statically
@@ -24,9 +27,21 @@ class eZS3Upload
     * @param boolean $useSSL Enable SSL
     * @return void
     */
-    public function __construct($accessKey = null, $secretKey = null, $useSSL = true) {
+    public function __construct($accessKey = null, $secretKey = null, $useSSL = true, $parentNodeID = 2) {
         if ($accessKey !== null && $secretKey !== null)
             self::setAuth($accessKey, $secretKey);
+        if ($parentNodeID !== null)
+            self::setParentNodeID($parentNodeID);
+    }
+
+    /**
+    * Set parent nodeID
+    *
+    * @param string $parentNodeID Parent NodeID
+    * @return void
+    */
+    public function setParentNodeID($parentNodeID) {
+        self::$parentNodeID = $parentNodeID;
     }
 
     /**
@@ -175,21 +190,17 @@ class eZS3Upload
     */
     public static function cliStoreFileNameInNewFileObject( $uri, &$cli, &$script )
     {
-        $creatorID = 14;
-        $classIdentifier = 's3_file';
-        $parentNodeID = 2;
-
         /** Calculate file name, path, upload subdirectory **/
         $fileUriArray = array_reverse( explode( '/', $uri ) );
         $fileName = $fileUriArray[0];
 
         $params = array();
         $attributeList = array();
-        $attributeList['name'] = "$fileName";
+        $attributeList['title'] = "$fileName";
         $attributeList['aws_s3_upload_client'] = "$uri";
-        $params['creator_id'] = $creatorID;
-        $params['class_identifier'] = $classIdentifier;
-        $params['parent_node_id'] = $parentNodeID;
+        $params['creator_id'] = self::$creatorID;
+        $params['class_identifier'] = self::$classIdentifier;
+        $params['parent_node_id'] = self::$parentNodeID;
         $params['attributes'] = $attributeList;
 
         $operationResult = eZContentFunctions::createAndPublishObject( $params );
@@ -213,21 +224,17 @@ class eZS3Upload
     */
     public static function storeFileNameInNewFileObject( $uri )
     {
-        $creatorID = 14;
-        $classIdentifier = 's3_file';
-        $parentNodeID = 2;
-
         /** Calculate file name, path, upload subdirectory **/
         $fileUriArray = array_reverse( explode( '/', $uri ) );
         $fileName = $fileUriArray[0];
 
         $params = array();
         $attributeList = array();
-        $attributeList['name'] = "$fileName";
+        $attributeList['title'] = "$fileName";
         $attributeList['aws_s3_upload_client'] = "$uri";
-        $params['creator_id'] = $creatorID;
-        $params['class_identifier'] = $classIdentifier;
-        $params['parent_node_id'] = $parentNodeID;
+        $params['creator_id'] = $this->creatorID;
+        $params['class_identifier'] = $this->classIdentifier;
+        $params['parent_node_id'] = $this->parentNodeID;
         $params['attributes'] = $attributeList;
 
         $operationResult = eZContentFunctions::createAndPublishObject( $params );
