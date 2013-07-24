@@ -121,14 +121,14 @@ a.progressCancel {
     display: block;
     height: 14px;
     width: 14px;
-    background-image: url(../images/cancelbutton.gif);
+    /* background-image: url(../images/cancelbutton.gif);
     background-repeat: no-repeat;
-    background-position: -14px 0px;
+    background-position: -14px 0px; */
     float: right;
 }
 
 a.progressCancel:hover {
-    background-position: 0px 0px;
+    /* background-position: 0px 0px; */
 }
 
 
