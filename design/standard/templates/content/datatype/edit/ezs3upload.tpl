@@ -11,14 +11,18 @@
 
 {ezcss_load( 'ezs3upload.css' )}
 
+{* ezscript_load( array( 'ezjsc::jquery', 'ezjsc::jqueryio' ) )}
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
 <script type="text/javascript">
     google.load("jquery", "1.3");
 </script>
-
 {ezscript_load( array( 'swfupload.js' ) )}
 {ezscript_load( array( 'fileprogress.js' ) )}
-{ezscript_load( array( 'jquery.swfupload.js' ) )}
+{ezscript_load( array( 'jquery.swfupload.js' ) ) *}
+
+{ezscript_require( 'swfupload.js' )}
+{ezscript_require( 'fileprogress.js' )}
+{ezscript_require( 'jquery.swfupload.js' )}
 
 <script type="text/javascript">
 {literal}
@@ -294,19 +298,19 @@ function updateDisplay(swfu,file) {
     <form id="s3FileUploadForm" action="#" enctype="multipart/form-data" method="post">
         <div class="fieldset">
             <table style="vertical-align:top;">
-                <tr>
+                <tr style="background: none;">
                     <td>
                         <div>
                             <div>
                                 <div id="swfupload-control" style="display:inline; position: relative; top: -8px;"><input type="button" id="mybutton" />&nbsp;&nbsp;</div><div id="fsUploadProgress2" style="display:inline; position: relative; top: -19px;"></div><input type="text" id="txtFileName" disabled="true" style="display:inline; position: relative; top: -19px; border: solid 1px; background-color: #FFFFFF;" />&nbsp;<input type="submit" value="Upload" id="btnSubmit" style="position: relative; top: -14px; font-weight: bold; font-size: 2.0em" />
                             </div>
-                                {* <!-- This is the container that the upload progress elements will be added to --> *}
+                            {* <!-- This is the container that the upload progress elements will be added to --> *}
 
                             <div id="uploadProgressContainer">
                             <div class="flash" id="fsUploadProgress"></div>
                             </div>
                             <input type="hidden" name="hidFileID" id="hidFileID" value="" />
-                                {* <!-- This is where the file ID is stored after SWFUpload uploads the file and gets the ID back from upload.php --> *}
+                            {* <!-- This is where the file ID is stored after SWFUpload uploads the file and gets the ID back from upload.php --> *}
                         </div>
                     </td>
                 </tr>
