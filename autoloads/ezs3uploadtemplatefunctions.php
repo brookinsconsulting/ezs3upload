@@ -62,6 +62,17 @@ class ezs3uploadTemplateFunctions
     {
         switch ( $operatorName )
         {
+	        case 'get_download_url':
+            {
+				$awsAccessKey = eZINI::instance( 's3.ini' )->variable( 'S3Settings', 'Key' );
+				$awsSecretKey = eZINI::instance( 's3.ini' )->variable( 'S3Settings', 'SecretKey' );
+				$awsBucket = eZINI::instance( 's3.ini' )->variable( 'S3Settings', 'Bucket' );
+				
+				$s3 = new S3( $awsAccessKey, $awsSecretKey );
+				
+				$operatorValue = $s3->getAuthenticatedURL($awsBucket, $operatorValue, 6000);
+				
+            } break;
             case 'aws_s3_policydoc64':
             {
                 $operatorValue = self::aws_s3_policydoc64();
