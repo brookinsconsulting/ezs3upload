@@ -126,6 +126,8 @@ class ezs3uploadType extends eZDataType
         {
             $data = $http->postVariable( $base . '_ezstring_data_text_' . $contentObjectAttribute->attribute( 'id' ) );
             $contentObjectAttribute->setAttribute( 'data_text', $data );
+            $this->storeFilesize($contentObjectAttribute, $data);
+
             /* $contentObjectAttribute->setContent( $data ); */
             return true;
         }
@@ -231,6 +233,14 @@ class ezs3uploadType extends eZDataType
     function objectAttributeContent( $contentObjectAttribute )
     {
         $data = $contentObjectAttribute->attribute( 'data_text' );
+
+        // check if data_int(filesize) is set
+        if (!$contentObjectAttribute->attribute( 'data_int' ))
+            $this->storeFilesize(
+                $contentObjectAttribute,
+                $data
+            );
+
         return $data;
     }
 
@@ -241,8 +251,23 @@ class ezs3uploadType extends eZDataType
         return eZDataType::objectDisplayInformation( $objectAttribute, $info );
     }
 
+    /*!
+     Store filesize
+    */
+    function storeFilesize( $contentObjectAttribute, $s3_uri ) {
+        require_once 'extension/ezs3upload/classes/S3.php';
+        $awsAccessKey = eZINI::instance( 's3.ini' )->variable( 'S3Settings', 'Key' );
+        $awsSecretKey = eZINI::instance( 's3.ini' )->variable( 'S3Settings', 'SecretKey' );
+        $awsBucket = eZINI::instance( 's3.ini' )->variable( 'S3Settings', 'Bucket' );
+        $s3 = new S3( $awsAccessKey, $awsSecretKey );
+        $filedata = $s3->getObjectInfo($awsBucket, $s3_uri);
+        if (!$filedata || !array_key_exists("size", $filedata)) return false;
+        return $contentObjectAttribute->setAttribute( 'data_int', intval($filedata['size']));
+    }
+
 }
 
 eZDataType::register( ezs3uploadType::DATA_TYPE_STRING, 'ezs3uploadType' );
 
 ?>
+
