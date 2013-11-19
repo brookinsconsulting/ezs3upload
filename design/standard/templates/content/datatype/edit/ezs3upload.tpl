@@ -39,10 +39,13 @@ var isMacUser = {/literal}{if $is_mac_user|eq( true() )}'true'{else}'false'{/if}
 var successURL = null;
 
 $(function(){
+
+var txtezpFieldFileName = document.getElementById("{/literal}ezcoa-{if ne( $attribute_base, 'ContentObjectAttribute' )}{$attribute_base}-{/if}{$attribute.contentclassattribute_id}_{$attribute.contentclass_attribute_identifier}{literal}");
+
     $('#swfupload-control').swfupload({
 {/literal}
         upload_url: "http://{$aws_s3_bucket}.s3.amazonaws.com/",
-        post_params: {literal}{{/literal}"AWSAccessKeyId":"{$aws_access_key_id}", "key":{literal}"${filename}"{/literal}, "acl":"public-read", "policy":"{$policyDoc64}", "signature":"{$sigPolicyDoc}","success_action_status":"201", "content-type":"image/"{literal}}{/literal},
+        post_params: {literal}{{/literal}"AWSAccessKeyId":"{$aws_access_key_id}", "key":{literal}txtezpFieldFileName.value + "${filename}"{/literal}, "acl":"public-read", "policy":"{$policyDoc64}", "signature":"{$sigPolicyDoc}","success_action_status":"201", "content-type":"image/"{literal}}{/literal},
 
         http_success : [201],
         assume_success_timeout : {if $is_mac_user|eq( true() )}5{else}0{/if},
@@ -236,7 +239,7 @@ $(function(){
                 //FORM SUBMIT document.forms[0].submit();
 
                 var txtezpFieldFileName = document.getElementById("{/literal}ezcoa-{if ne( $attribute_base, 'ContentObjectAttribute' )}{$attribute_base}-{/if}{$attribute.contentclassattribute_id}_{$attribute.contentclass_attribute_identifier}{literal}");
-                txtezpFieldFileName.value = document.getElementById("txtFileName").value;
+                txtezpFieldFileName.value = txtezpFieldFileName.value + document.getElementById("txtFileName").value;
 
                 var txtFileName = document.getElementById("txtFileName");
                 txtFileName.value = '';
@@ -292,7 +295,9 @@ function updateDisplay(swfu,file) {
 {/literal}
 </script>
 
-<input id="ezcoa-{if ne( $attribute_base, 'ContentObjectAttribute' )}{$attribute_base}-{/if}{$attribute.contentclassattribute_id}_{$attribute.contentclass_attribute_identifier}" class="{eq( $html_class, 'half' )|choose( 'box', 'halfbox' )} ezcc-{$attribute.object.content_class.identifier} ezcca-{$attribute.object.content_class.identifier}_{$attribute.contentclass_attribute_identifier}" type="text" size="70" name="{$attribute_base}_ezstring_data_text_{$attribute.id}" value="{$attribute.data_text|wash( xhtml )}" />
+{def $parentNode=fetch( 'content', 'node', hash( 'node_id', $attribute.object.current.temp_main_node.parent_node_id ) )}
+
+<input id="ezcoa-{if ne( $attribute_base, 'ContentObjectAttribute' )}{$attribute_base}-{/if}{$attribute.contentclassattribute_id}_{$attribute.contentclass_attribute_identifier}" class="{eq( $html_class, 'half' )|choose( 'box', 'halfbox' )} ezcc-{$attribute.object.content_class.identifier} ezcca-{$attribute.object.content_class.identifier}_{$attribute.contentclass_attribute_identifier}" type="text" size="70" name="{$attribute_base}_ezstring_data_text_{$attribute.id}" value="{if or( $attribute.data_text|eq(''), $attribute.data_text|contains('/')|not )}{concat( $parentNode.url, '/', $attribute.data_text|wash( xhtml ) )}{else}{$attribute.data_text|wash( xhtml )}{/if}" />
 
 <div id="content">
     {* <form id="s3FileUploadForm" action="#" enctype="multipart/form-data" method="post"> *}
