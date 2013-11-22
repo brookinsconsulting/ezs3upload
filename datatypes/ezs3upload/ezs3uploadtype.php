@@ -270,4 +270,3 @@ class ezs3uploadType extends eZDataType
 eZDataType::register( ezs3uploadType::DATA_TYPE_STRING, 'ezs3uploadType' );
 
 ?>
-
