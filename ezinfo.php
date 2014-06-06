@@ -13,8 +13,8 @@ class ezs3uploadInfo
     function info()
     {
         return array(
-            'Name' => "<a href='http://github.com/brookinsconsulting/ezs3upload'>eZ S3 Upload Client</a>",
-            'Version' => "0.4.2",
+            'Name' => "<a href='http://github.com/brookinsconsulting/ezs3upload'>eZ S3 Upload Solution</a>",
+            'Version' => "0.4.7",
             'Copyright' => array( "Copyright (C) 1999 - 2014 <a href='http://brookinsconsulting.com'>Brookins Consulting</a>",
                                   "Copyright (C) 2013 - 2014, <a href='http://thinkcreative.com'>Think Creative</a>",
                                   "Copyright (c) 2008, <a href='http://undesigned.org.za/2007/10/22/amazon-s3-php-class'>Donovan Schönknecht</a>. All rights reserved" ),
