@@ -23,7 +23,7 @@ require 'autoload.php';
 $cli = eZCLI::instance();
 $script = eZScript::instance( array( 'description' => ( "eZ Publish AWS S3 Rename Script\n" .
                                                         "\n" .
-                                                        "ezs3rename.php --parent-node=2 --min=15" ),
+                                                        "ezs3rename.php --parent-node=2 --hours=1 --min=15" ),
                                      'use-session' => false,
                                      'use-modules' => true,
                                      'use-extensions' => true,
@@ -126,6 +126,16 @@ if( isset( $options['min'] ) && !isset( $options['hours'] ) )
     }
     $modifiedTimeStamp = time() - ( $minsAgo * 60 );
 }
+elseif( isset( $options['min'] ) && isset( $options['hours'] ) )
+{
+    /** Optional debug output **/
+
+    if( $troubleshoot && $scriptVerboseLevel >= 5 )
+    {
+        $cli->output( "Searching: Using hours and minutes to search: " . $hoursAgo . ' Hours and ' . $minsAgo . " Minutes\n");
+    }
+    $modifiedTimeStamp = time() - ( ( $hoursAgo * 3600 ) + ( $minsAgo * 60 ) );
+}
 else
 {
     /** Optional debug output **/
@@ -180,6 +190,11 @@ if ( !$totalFileCount )
 if( isset( $options['min'] ) && !isset( $options['hours'] ) )
 {
     $whileAgo = $minsAgo;
+    $whileSpan = 'Minutes';
+}
+elseif( isset( $options['min'] ) && isset( $options['hours'] ) )
+{
+    $whileAgo = $hoursAgo . "' Hours and '" . $minsAgo;
     $whileSpan = 'Minutes';
 }
 else
