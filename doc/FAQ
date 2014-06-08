@@ -4,3 +4,6 @@ Error: Unexpected error, the message was : No credentials were provided. The SDK
 
 Solution: Copy extension/ezs3upload/classes/aws-sdk/config-sample.inc.php to extension/ezs3upload/classes/aws-sdk/config.inc.php and populate AWS Key and SecretKey in config file
 
+Error: PHP Fatal error:  Class 'AmazonS3' not found in /var/www/freshfromflorida/ezpublish_legacy/extension/ezs3upload/bin/php/ezs3rename.php on line 302
+
+Solution: Regenerate eZ Publish PHP Autoloads. Run ./bin/php/ezpgenerateautoloads.php

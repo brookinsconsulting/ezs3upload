@@ -160,7 +160,7 @@ $subTreeCountByNodeIDParams = array( 'ClassFilterType' => 'include',
                                      'ClassFilterArray' => array( $fetchClassIdentifier ),
                                      'AttributeFilter' => array( 'and', array( 'modified','>=', $modifiedTimeStamp ),
                                                                         array( "large_file/$renameAtributeIdentifier",'!=', true ) ),
-                                     'Depth', 4,
+                                     'Depth', 5,
                                      'MainNodeOnly', true,
                                      'IgnoreVisibility', true );
 
@@ -248,7 +248,7 @@ while ( $offset < $totalFileCount )
                                     'Limit', $limit,
                                     'Offset', $offset,
                                     'SortBy', array( 'modified', false ),
-                                    'Depth', 4,
+                                    'Depth', 5,
                                     'MainNodeOnly', true,
                                     'IgnoreVisibility', true );
 
@@ -425,6 +425,7 @@ function executionTimeDisplay( $srcStartTime, $cli )
     /** Alert the user to how long the script execution took place **/
     $cli->output( "This script execution completed in " . $executionTime . " seconds" . ".\n" );
 }
+
 /** Call for display of execution time **/
 executionTimeDisplay( $srcStartTime, $cli );
 

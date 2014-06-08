@@ -114,6 +114,8 @@ Usage of datatype
 
 - Unpack, Install and Activate extension.
 
+- Regenerate eZ Publish PHP Autoloads
+
 - Configure s3.ini.append.php settings: Key, SecretKey, Bucket
 
 - Add datatype to content class.
@@ -135,6 +137,8 @@ Usage of aws s3 file rename support
 - Make sure you have all the requirements (listed above).
 
 - Unpack, Install and Activate extension.
+
+- Regenerate eZ Publish PHP Autoloads
 
 - Configure s3.ini.append.php settings: Key, SecretKey, Bucket
 
@@ -158,7 +162,9 @@ Usage of command line scripts
 
 - Make sure you have all the requirements (listed above).
 
-- Unpack and Install extension.
+- Unpack, Install and Activate extension.
+
+- Regenerate eZ Publish PHP Autoloads
 
 - Configure s3.ini.append.php settings: Key, SecretKey, Bucket
 
