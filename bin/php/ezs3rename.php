@@ -182,7 +182,7 @@ if( $verbose )
 {
     if( $totalFileCount > 0 )
     {
-        $cli->output( "Found! Modified S3 File objects to be checked: " . $totalFileCount . "\n" );
+        $cli->warning( "Found! Modified S3 File objects to be checked: " . $totalFileCount . "\n" );
     }
 }
 
@@ -218,7 +218,7 @@ else
 
 if( $verbose && !$force )
 {
-    $cli->output( "Querying content tree for S3 large file objects from starting node '$parentNodeID' modified in the last '$whileAgo' $whileSpan ...\n" );
+    $cli->output( "Querying content tree for S3 large file objects with parent node of '$parentNodeID' modified in the last '$whileAgo' $whileSpan ...\n" );
     $cli->warning( "You can run this script with --force parameter to skip this script startup delay and execute immediately.\n" );
     $cli->warning( "You have 10 seconds to stop the script execution before it starts (press Ctrl-C)." );
 
@@ -227,7 +227,7 @@ if( $verbose && !$force )
 }
 elseif( $verbose && $force )
 {
-    $cli->output( "Querying content tree for S3 large file objects from starting node '$parentNodeID' modified in the last '$whileAgo' $whileSpan ...\n" );
+    $cli->output( "Querying content tree for S3 large file objects with parent node of '$parentNodeID' modified in the last '$whileAgo' $whileSpan ...\n" );
 }
 
 /** Setup script iteration details **/
@@ -286,36 +286,41 @@ while ( $offset < $totalFileCount )
 
         $object = $childNode->attribute( 'object' );
         $objectID = $object->attribute( 'id' );
-        $classIdentifier = $object->attribute( 'class_identifier' );
-        $nodeDataMap = $object->dataMap();
+        $objectCurrentVersion = $object->attribute( 'current_version' );
+        $objectLastVersion = $objectCurrentVersion - 1;
+        $objectDataMap = $object->dataMap();
+        $objectPathName = $objectDataMap[ $attributeIdentifier ]->content();
 
-        $childNodeID = $childNode->attribute('node_id');
-        $nodeFullName = $childNode->attribute('name');
-
-        $nodeCurrentVersion = $object->attribute( 'current_version' );
-        $nodeLastVersion = $nodeCurrentVersion - 1;
+        $nodeID = $childNode->attribute('node_id');
+        $nodeUrl = $childNode->attribute('url');
 
         /** Only iterate over versions of nodes greater than zero **/
 
-        if( $nodeLastVersion > 0 )
+        if( $objectLastVersion > 0 )
         {
-            $nodePastDataMap = $object->fetchDataMap( $nodeLastVersion );
-
-            $nodePathName = $nodeDataMap[ $attributeIdentifier ]->content();
-            $nodePastPathName = $nodePastDataMap[ $attributeIdentifier ]->content();
+            $objectPastDataMap = $object->fetchDataMap( $objectLastVersion );
+            $objectPastPathName = $objectPastDataMap[ $attributeIdentifier ]->content();
 
             /** Debug verbose output **/
 
             if( $troubleshoot && $scriptVerboseLevel >= 3 )
             {
-                $cli->output( "Found! S3 File object pending rename: " . $childNode->attribute('url') . "\n" );
-                $cli->output( "Last Version Path: " . $nodePastPathName . "" );
-                $cli->output( "Current Path: " . $nodePathName . "\n" );
+                $cli->warning( "Found! S3 File object pending rename: " . $nodeUrl . ", NodeID " . $nodeID . "\n" );
+
+                if( $troubleshoot && $scriptVerboseLevel >= 5 )
+                {
+                    $cli->output( "Past Version Path: " . $objectPastPathName . "" );
+                    $cli->output( "New Path: " . $objectPathName . "\n" );
+                }
+                else
+                {
+                    $cli->output( "Attempting S3 File object copy. From: " . $objectPastPathName . " To: " . $objectPathName ."\n" );
+                }
             }
 
             /** Only iterate over versions of nodes path attributes which do not match **/
 
-            if ( $nodePathName != $nodePastPathName  )
+            if ( $objectPathName != $objectPastPathName  )
             {
                 /** Connect to aws s3 service **/
 
@@ -326,10 +331,10 @@ while ( $offset < $totalFileCount )
                 $response = $awsS3->copy_object(
                             array(// Source
                                   'bucket' => $awsS3Bucket,
-                                  'filename' => $nodePastPathName ),
+                                  'filename' => $objectPastPathName ),
                             array(// Destination
                                   'bucket' => $awsS3Bucket,
-                                  'filename' => $nodePathName ) );
+                                  'filename' => $objectPathName ) );
 
                 /** Only delete old s3 file object if copy is a success **/
 
@@ -339,10 +344,10 @@ while ( $offset < $totalFileCount )
 
                     if( $verbose )
                     {
-                        $cli->output( "Copy file path name on AWS S3 successfull! New path: '$nodePathName'\n");
+                        $cli->output( "Success: AWS S3 File object path copied. New path: '$objectPathName'\n");
                     }
 
-                    $delete = $awsS3->delete_object( $awsS3Bucket, $nodePastPathName );
+                    $delete = $awsS3->delete_object( $awsS3Bucket, $objectPastPathName );
 
                     /** Optional debug output **/
 
@@ -357,7 +362,7 @@ while ( $offset < $totalFileCount )
 
                         if( $verbose )
                         {
-                            $cli->output( "Success: Deletion of AWS S3 File object. Path: '$nodePastPathName'\n");
+                            $cli->output( "Success: Deletion of AWS S3 File object. Deleted Path: '$objectPastPathName'\n");
                         }
 
                         /** Only modify object if s3 file has been renamed Publish new object with renamed attribute checked **/
@@ -385,15 +390,15 @@ while ( $offset < $totalFileCount )
 
                     if( $verbose )
                     {
-                        $cli->output( "Failure! S3 File object failed to be renamed: " . $childNode->attribute('url') . "\n" );
-                        $cli->output( "S3 File object last version path: " . $nodePastPathName . "" );
-                        $cli->output( "S3 File object current path: " . $nodePathName . "\n" );
+                        $cli->error( "Failure! S3 File object failed to be renamed: " . $nodeUrl . ", NodeID " . $nodeID . "\n" );
+                        $cli->error( "S3 File object copy from: " . $objectPastPathName . " to " . $objectPathName .  " failed\n" );
+                        //$cli->output( "S3 File object current path: " . $objectPathName . "\n" );
 
                         /** Catch error, 404 file not found **/
 
                         if( $response->status == 404 )
                         {
-                            $cli->output( "Reason: S3 File object copy failed because file path " . $nodePastPathName . " no longer exists\n" );
+                            $cli->warning( "Reason: S3 File object copy failed because file path " . $objectPastPathName . " no longer exists\n" );
                         }
                     }
 
