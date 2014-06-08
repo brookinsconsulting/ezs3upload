@@ -142,8 +142,6 @@ Usage of aws s3 file rename support
 
 - Configure s3.ini.append.php settings: Key, SecretKey, Bucket
 
-- Configure aws sdk, create extension/ezs3upload/classes/aws-sdk/config.inc.php from extension/ezs3upload/classes/aws-sdk/config-sample.inc.php Populate AWS Key and SecretKey
-
 - Edit your aws s3 file content object class and add a checkbox with the content class identifier attribute of 'aws_s3_renamed'. Required by rename script. Identifier implemented as s3.ini setting.
 
 - Publish a new version of a aws s3 file enabled class object with a s3 reference path change.
@@ -178,7 +176,7 @@ Usage of command line scripts
 
 - Example of the upload remote new files and create new s3_file content objects: ./extension/ezs3upload/bin/php/ezs3uploadnewfilesbyurl.php --subdirectory=upload/ --permissions=read --storage-dir=var/import/ --removetempfile
 
-- Example of the upload rename files based on changes in the admin: php -d memory_limit=-1 ./extension/ezs3upload/bin/php/ezs3rename.php --parent-node=2 --min=15 --script-verbose=true --script-verbose-level=2
+- Example of the upload rename files based on changes in the admin: php -d memory_limit=-1 ./extension/ezs3upload/bin/php/ezs3rename.php --parent-node=2 --min=15 --script-verbose=true --script-verbose-level=2  --force
 
 
 Troubleshooting

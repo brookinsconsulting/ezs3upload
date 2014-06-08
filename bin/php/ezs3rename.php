@@ -53,9 +53,9 @@ $limit = 100;
 $offset = 0;
 $adminUserID = 14;
 
-$fetchClassIdentifier = eZINI::instance( 's3.ini' )->variable( 'S3Settings', 'ClassIdentifier' );
-$attributeIdentifier = eZINI::instance( 's3.ini' )->variable( 'S3Settings', 'AttributeIdentifier' );
-$renameAtributeIdentifier = eZINI::instance( 's3.ini' )->variable( 'S3Settings', 'RenameAttributeIdentifier' );
+$s3FileClassIdentifier = eZINI::instance( 's3.ini' )->variable( 'S3Settings', 'ClassIdentifier' );
+$s3FileAttributeIdentifier = eZINI::instance( 's3.ini' )->variable( 'S3Settings', 'AttributeIdentifier' );
+$s3FileRenameAttributeIdentifier = eZINI::instance( 's3.ini' )->variable( 'S3Settings', 'RenameAttributeIdentifier' );
 $awsS3Bucket = eZINI::instance( 's3.ini' )->variable( 'S3Settings', 'Bucket' );
 
 /** Login script to run as admin user  This is required to see past content tree permissions, sections and other limitations **/
@@ -131,7 +131,7 @@ if( isset( $options['min'] ) && !isset( $options['hours'] ) )
     {
         $cli->output( "Searching: Using minutes to search: " . $minsAgo . "\n");
     }
-    $modifiedTimeStamp = time() - ( $minsAgo * 60 );
+    $searchTimeStampInSeconds = time() - ( $minsAgo * 60 );
 }
 elseif( isset( $options['min'] ) && isset( $options['hours'] ) )
 {
@@ -141,7 +141,7 @@ elseif( isset( $options['min'] ) && isset( $options['hours'] ) )
     {
         $cli->output( "Searching: Using hours and minutes to search: " . $hoursAgo . ' Hours and ' . $minsAgo . " Minutes\n");
     }
-    $modifiedTimeStamp = time() - ( ( $hoursAgo * 3600 ) + ( $minsAgo * 60 ) );
+    $searchTimeStampInSeconds = time() - ( ( $hoursAgo * 3600 ) + ( $minsAgo * 60 ) );
 }
 else
 {
@@ -151,15 +151,15 @@ else
     {
         $cli->output( "Searching: Using hours to search: " . $hoursAgo . "\n");
     }
-    $modifiedTimeStamp = time() - ( $hoursAgo * 3600 );
+    $searchTimeStampInSeconds = time() - ( $hoursAgo * 3600 );
 }
 
 /** Fetch total files count from content tree **/
 
 $subTreeCountByNodeIDParams = array( 'ClassFilterType' => 'include',
-                                     'ClassFilterArray' => array( $fetchClassIdentifier ),
-                                     'AttributeFilter' => array( 'and', array( 'modified','>=', $modifiedTimeStamp ),
-                                                                        array( "large_file/$renameAtributeIdentifier",'!=', true ) ),
+                                     'ClassFilterArray' => array( $s3FileClassIdentifier ),
+                                     'AttributeFilter' => array( 'and', array( 'modified','>=', $searchTimeStampInSeconds ),
+                                                                        array( "large_file/$s3FileRenameAttributeIdentifier",'!=', true ) ),
                                      'Depth', 5,
                                      'MainNodeOnly', true,
                                      'IgnoreVisibility', true );
@@ -216,18 +216,18 @@ else
 
 /** Alert user of script process starting **/
 
+if( $verbose )
+{
+    $cli->output( "Querying content tree for S3 large file objects\nwith parent node of '$parentNodeID' modified in the last\n'$whileAgo' $whileSpan ...\n" );
+}
+
 if( $verbose && !$force )
 {
-    $cli->output( "Querying content tree for S3 large file objects with parent node of '$parentNodeID' modified in the last '$whileAgo' $whileSpan ...\n" );
     $cli->warning( "You can run this script with --force parameter to skip this script startup delay and execute immediately.\n" );
     $cli->warning( "You have 10 seconds to stop the script execution before it starts (press Ctrl-C)." );
 
     sleep( 10 );
     $cli->output();
-}
-elseif( $verbose && $force )
-{
-    $cli->output( "Querying content tree for S3 large file objects with parent node of '$parentNodeID' modified in the last '$whileAgo' $whileSpan ...\n" );
 }
 
 /** Setup script iteration details **/
@@ -241,28 +241,28 @@ while ( $offset < $totalFileCount )
 {
     /** Fetch nodes under starting node in content tree **/
 
-    $subTreeByNodeIDParams = array( 'ClassFilterType' => 'include',
-                                    'ClassFilterArray' => array( $fetchClassIdentifier ),
-                                    'AttributeFilter' => array( 'and', array( 'modified','>=', $modifiedTimeStamp ),
-                                                                       array( "large_file/$renameAtributeIdentifier",'!=', true ) ),
-                                    'Limit', $limit,
-                                    'Offset', $offset,
-                                    'SortBy', array( 'modified', false ),
-                                    'Depth', 5,
-                                    'MainNodeOnly', true,
-                                    'IgnoreVisibility', true );
+    $subTreeParams = array( 'ClassFilterType' => 'include',
+                            'ClassFilterArray' => array( $s3FileClassIdentifier ),
+                            'AttributeFilter' => array( 'and', array( 'modified','>=', $searchTimeStampInSeconds ),
+                                                               array( "large_file/$s3FileRenameAttributeIdentifier",'!=', true ) ),
+                            'Limit', $limit,
+                            'Offset', $offset,
+                            'SortBy', array( 'modified', false ),
+                            'Depth', 5,
+                            'MainNodeOnly', true,
+                            'IgnoreVisibility', true );
 
     /** Optional debug output **/
 
     if( $troubleshoot && $scriptVerboseLevel >= 5 )
     {
         $cli->output( "S3 File object fetch params: \n");
-        $cli->output( print_r( $subTreeByNodeIDParams ) );
+        $cli->output( print_r( $subTreeParams ) );
     }
 
     /** Fetch nodes with limit and offset **/
 
-    $subTree = eZContentObjectTreeNode::subTreeByNodeID( $subTreeByNodeIDParams, $parentNodeID );
+    $subTree = eZContentObjectTreeNode::subTreeByNodeID( $subTreeParams, $parentNodeID );
 
     /** Optional debug output **/
 
@@ -289,7 +289,7 @@ while ( $offset < $totalFileCount )
         $objectCurrentVersion = $object->attribute( 'current_version' );
         $objectLastVersion = $objectCurrentVersion - 1;
         $objectDataMap = $object->dataMap();
-        $objectPathName = $objectDataMap[ $attributeIdentifier ]->content();
+        $objectPathName = $objectDataMap[ $s3FileAttributeIdentifier ]->content();
 
         $nodeID = $childNode->attribute('node_id');
         $nodeUrl = $childNode->attribute('url');
@@ -299,7 +299,7 @@ while ( $offset < $totalFileCount )
         if( $objectLastVersion > 0 )
         {
             $objectPastDataMap = $object->fetchDataMap( $objectLastVersion );
-            $objectPastPathName = $objectPastDataMap[ $attributeIdentifier ]->content();
+            $objectPastPathName = $objectPastDataMap[ $s3FileAttributeIdentifier ]->content();
 
             /** Debug verbose output **/
 
@@ -367,17 +367,17 @@ while ( $offset < $totalFileCount )
 
                         /** Only modify object if s3 file has been renamed Publish new object with renamed attribute checked **/
 
-                        $params = array();
-                        $attributeList = array( "$renameAtributeIdentifier" => 1 );
-                        $params['attributes'] = $attributeList;
+                        $updateParams = array();
+                        $updateAttributeList = array( "$s3FileRenameAttributeIdentifier" => 1 );
+                        $updateParams['attributes'] = $updateAttributeList;
 
-                        $result = eZContentFunctions::updateAndPublishObject( $object, $params );
+                        $updateResult = eZContentFunctions::updateAndPublishObject( $object, $updateParams );
 
                         /** Debug verbose output **/
 
                         if( $verbose )
                         {
-                            $cli->output( "Publishing new large_file object version with $renameAtributeIdentifier attribute checked\n");
+                            $cli->output( "Publishing new large_file object version with $s3FileRenameAttributeIdentifier attribute checked\n");
                         }
 
                         /** Iterate cli script progress tracker **/
@@ -392,7 +392,6 @@ while ( $offset < $totalFileCount )
                     {
                         $cli->error( "Failure! S3 File object failed to be renamed: " . $nodeUrl . ", NodeID " . $nodeID . "\n" );
                         $cli->error( "S3 File object copy from: " . $objectPastPathName . " to " . $objectPathName .  " failed\n" );
-                        //$cli->output( "S3 File object current path: " . $objectPathName . "\n" );
 
                         /** Catch error, 404 file not found **/
 
