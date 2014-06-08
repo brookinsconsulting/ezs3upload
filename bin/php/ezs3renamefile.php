@@ -10,6 +10,10 @@
  * @package ezps3upload
  */
 
+/** Add a starting timing point tracking script execution time **/
+
+$srcStartTime = microtime();
+
 /** Disable script php memory limit **/
 
 ini_set("memory_limit", -1);
@@ -148,6 +152,15 @@ else
         $cli->output( "Copy S3 File object response: \n" . print_r( $response ) );
     }
 }
+
+/** Add a stoping timing point tracking and calculating total script execution time **/
+$srcStopTime = microtime();
+$startTime = next( explode( " ", $srcStartTime ) ) + current( explode( " ", $srcStartTime ) );
+$stopTime = next( explode( " ", $srcStopTime ) ) + current( explode( " ", $srcStopTime ) );
+$executionTime = round( $stopTime - $startTime, 2 );
+
+/** Alert the user to how long the script execution took place **/
+$cli->output( "This script execution completed in " . $executionTime . " seconds" . ".\n" );
 
 /** Shutdown script **/
 $script->shutdown();

@@ -11,5 +11,6 @@ ClassIdentifier=large_file
 AttributeIdentifier=aws_s3_upload_client
 RenameAttributeIdentifier=aws_s3_renamed
 HoursAgo=1
+MinsAgo=60
 
 */ ?>
