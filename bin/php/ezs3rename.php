@@ -35,9 +35,10 @@ $script = eZScript::instance( array( 'description' => ( "eZ Publish AWS S3 Renam
 
 $script->startup();
 
-$options = $script->getOptions( "[script-verbose;][script-verbose-level;][parent-node:][hours;][min;]",
+$options = $script->getOptions( "[force;][script-verbose;][script-verbose-level;][parent-node:][hours;][min;]",
                                 "[node]",
                                 array( 'parent-node' => 'Content Tree Node ID. Example: --parent-node=2',
+                                       'force' => 'Force disables delayed startup. Example: ' . "'--force'" . ' is an optional parameter which defaults to false',
                                        'hours' => 'Number of hours to search in reverse. Example: --hours=5',
                                        'min' => 'Number of min instead of hours to search in reverse. Example: --min=15',
                                        'script-verbose' => 'Use this parameter to display verbose script output without disabling script iteration counting of images created or removed. Example: ' . "'--script-verbose'" . ' is an optional parameter which defaults to false',
@@ -111,6 +112,8 @@ if ( !is_numeric( $minsAgo ) )
     $cli->error( 'Please specify a numeric minute number' );
     $script->shutdown( 2 );
 }
+
+$force = isset( $options['force'] ) ? true : false;
 
 $verbose = isset( $options['script-verbose'] ) ? true : false;
 
@@ -209,10 +212,20 @@ else
 
 /** Alert user of script process starting **/
 
-if( $verbose )
+if( $verbose && !$force )
 {
-    $cli->output( "Querying content tree for S3 large file objects from starting node '$parentNodeID' for changes in the last '$whileAgo' $whileSpan ...\n" );
+    $cli->output( "Querying content tree for S3 large file objects from starting node '$parentNodeID' modified in the last '$whileAgo' $whileSpan ...\n" );
+    $cli->warning( "You can run this script with --force parameter to skip this script startup delay and execute immediately.\n" );
+    $cli->warning( "You have 10 seconds to stop the script execution before it starts (press Ctrl-C)." );
+
+    sleep( 10 );
+    $cli->output();
 }
+elseif( $verbose && $force )
+{
+    $cli->output( "Querying content tree for S3 large file objects from starting node '$parentNodeID' modified in the last '$whileAgo' $whileSpan ...\n" );
+}
+
 
 /** Setup script iteration details **/
 
