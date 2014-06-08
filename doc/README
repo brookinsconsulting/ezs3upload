@@ -8,8 +8,10 @@ that provides a simple datatype to upload files
 directly from a client web browser to
 Amazon's S3 File Hosting Service
 
-eZ S3 Upload Rename is a true eZ Publish cli script and cronjob
-that provides a simple way to rename s3 files from the admin ui.
+eZ S3 Upload Rename is a true eZ Publish cli
+script and cronjob that provides a simple way
+to rename s3 files from the admin ui.
+
 
 eZ S3 Upload Client version
 =======================
@@ -21,7 +23,7 @@ Last Major update: June 1, 2013
 eZ S3 Upload Rename version
 =======================
 
-The current version of eZ S3 Upload Client is 0.0.8
+The current version of eZ S3 Upload Client is 0.1.0
 Last major update: June 7, 2014
 
 
@@ -136,6 +138,8 @@ Usage of aws s3 file rename support
 
 - Configure s3.ini.append.php settings: Key, SecretKey, Bucket
 
+- Configure aws sdk, create extension/ezs3upload/classes/aws-sdk/config.inc.php from extension/ezs3upload/classes/aws-sdk/config-sample.inc.php Populate AWS Key and SecretKey
+
 - Edit your aws s3 file content object class and add a checkbox with the content class identifier attribute of 'aws_s3_renamed'. Required by rename script. Identifier implemented as s3.ini setting.
 
 - Publish a new version of a aws s3 file enabled class object with a s3 reference path change.
@@ -168,7 +172,7 @@ Usage of command line scripts
 
 - Example of the upload remote new files and create new s3_file content objects: ./extension/ezs3upload/bin/php/ezs3uploadnewfilesbyurl.php --subdirectory=upload/ --permissions=read --storage-dir=var/import/ --removetempfile
 
-- Example of the upload rename files based on changes in the admin: php -d memory_limit=-1 ./extension/ezs3upload/bin/php/ezs3rename.php --parent-node=2 --hours=6 --script-verbose=true --script-verbose-level=2
+- Example of the upload rename files based on changes in the admin: php -d memory_limit=-1 ./extension/ezs3upload/bin/php/ezs3rename.php --parent-node=2 --min=15 --script-verbose=true --script-verbose-level=2
 
 
 Troubleshooting
