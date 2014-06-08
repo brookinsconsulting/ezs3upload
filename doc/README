@@ -1,13 +1,15 @@
-eZ S3 Upload Client extension README
+eZ S3 Upload extension README
 
-What is the eZ S3 Upload Client extension?
+What is the eZ S3 Upload extension?
 ================================
 
-eZ S3 Upload Client is a true eZ Publish extension
+eZ S3 Upload is a true eZ Publish extension
 that provides a simple datatype to upload files
 directly from a client web browser to
 Amazon's S3 File Hosting Service
 
+eZ S3 Upload Rename is a true eZ Publish cli script and cronjob
+that provides a simple way to rename s3 files from the admin ui.
 
 eZ S3 Upload Client version
 =======================
@@ -16,10 +18,17 @@ The current version of eZ S3 Upload Client is 0.4.2
 Last Major update: June 1, 2013
 
 
+eZ S3 Upload Rename version
+=======================
+
+The current version of eZ S3 Upload Client is 0.0.8
+Last major update: June 7, 2014
+
+
 Copyright
 =========
 
-eZ S3 Upload Client is copyright 1999 - 2014 Brookins Consulting and Think Creative
+eZ S3 Upload is copyright 1999 - 2015 Brookins Consulting and Think Creative
 
 See: doc/COPYRIGHT for more information on the terms of the copyright and license
 
@@ -27,30 +36,30 @@ See: doc/COPYRIGHT for more information on the terms of the copyright and licens
 License
 =======
 
-eZ S3 Upload Client is licensed under the GNU General Public License.
+eZ S3 Upload is licensed under the GNU General Public License.
 
 The complete license agreement is included in the doc/LICENSE file.
 
-eZ S3 Upload Client is free software: you can redistribute it and/or modify
+eZ S3 Upload is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 2 of the License, or
 (at your option) any later version.
 
-eZ S3 Upload Client is distributed in the hope that it will be useful,
+eZ S3 Upload is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 The GNU GPL gives you the right to use, modify and redistribute
-eZ S3 Upload Client under certain conditions. The GNU GPL license
+eZ S3 Upload under certain conditions. The GNU GPL license
 is distributed with the software, see the file doc/LICENSE.
 
 It is also available at http://www.gnu.org/licenses/gpl.txt
 
 You should have received a copy of the GNU General Public License
-along with eZ S3 Upload Client in doc/LICENSE.  If not, see http://www.gnu.org/licenses/.
+along with eZ S3 Upload in doc/LICENSE.  If not, see http://www.gnu.org/licenses/.
 
-Using eZ S3 Upload Client under the terms of the GNU GPL is free (as in freedom).
+Using eZ S3 Upload under the terms of the GNU GPL is free (as in freedom).
 
 For more information or questions please contact
 license@brookinsconsulting.com
@@ -93,12 +102,15 @@ Features
 
 - Class provided can also upload local and remove files into Aws S3
 
+- Script to rename files in Aws S3 based on content tree changes and manually
+
+
 Usage of datatype
 ============
 
 - Make sure you have all the requirements (listed above).
 
-- Unpack and Install extension.
+- Unpack, Install and Activate extension.
 
 - Configure s3.ini.append.php settings: Key, SecretKey, Bucket
 
@@ -113,6 +125,28 @@ Usage of datatype
 - Note: You can upload as many files as you want without storing the content object.
 
 - Remember: Only the last file uploaded is stored within the content object attribute when the draft is stored or published.
+
+
+Usage of aws s3 file rename support
+============
+
+- Make sure you have all the requirements (listed above).
+
+- Unpack, Install and Activate extension.
+
+- Configure s3.ini.append.php settings: Key, SecretKey, Bucket
+
+- Edit your aws s3 file content object class and add a checkbox with the content class identifier attribute of 'aws_s3_renamed'. Required by rename script. Identifier implemented as s3.ini setting.
+
+- Publish a new version of a aws s3 file enabled class object with a s3 reference path change.
+
+- Run command line script or cronjob.
+
+-- Script: /usr/bin/php -d memory_limit=-1 ./extension/ezs3upload/bin/php/ezs3rename.php --parent-node=2 --min=15 --script-verbose=true --script-verbose-level=2
+
+-- Cronjob: /usr/bin/php -d memory_limit=-1 ./runcronjobs.php rename_aws_s3_files
+
+- Note: This solution is designed to be added to your crontab to run every 2 min.
 
 
 Usage of command line scripts
@@ -133,6 +167,8 @@ Usage of command line scripts
 - Example of the upload remote new files and update existing file content objects: ./extension/ezs3upload/bin/php/ezs3uploadfilesbyurl.php --subdirectory=upload/ --permissions=read --storage-dir=var/import/ --removetempfile
 
 - Example of the upload remote new files and create new s3_file content objects: ./extension/ezs3upload/bin/php/ezs3uploadnewfilesbyurl.php --subdirectory=upload/ --permissions=read --storage-dir=var/import/ --removetempfile
+
+- Example of the upload rename files based on changes in the admin: php -d memory_limit=-1 ./extension/ezs3upload/bin/php/ezs3rename.php --parent-node=2 --hours=6 --script-verbose=true --script-verbose-level=2
 
 
 Troubleshooting

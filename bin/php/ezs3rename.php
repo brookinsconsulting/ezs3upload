@@ -23,7 +23,7 @@ require 'autoload.php';
 $cli = eZCLI::instance();
 $script = eZScript::instance( array( 'description' => ( "eZ Publish AWS S3 Rename Script\n" .
                                                         "\n" .
-                                                        "ezs3rename.php --parent-node=2 --hours=1" ),
+                                                        "ezs3rename.php --parent-node=2 --hours=1 --min=15" ),
                                      'use-session' => false,
                                      'use-modules' => true,
                                      'use-extensions' => true,
@@ -31,12 +31,13 @@ $script = eZScript::instance( array( 'description' => ( "eZ Publish AWS S3 Renam
 
 $script->startup();
 
-$options = $script->getOptions( "[script-verbose;][script-verbose-level;][parent-node:][hours:]",
+$options = $script->getOptions( "[script-verbose;][script-verbose-level;][parent-node:][hours;][min;]",
                                 "[node]",
                                 array( 'parent-node' => 'Content Tree Node ID. Example: --parent-node=2',
                                        'hours' => 'Number of hours to search in reverse. Example: --hours=5',
+                                       'min' => 'Number of min instead of hours to search in reverse. Example: --min=15',
                                        'script-verbose' => 'Use this parameter to display verbose script output without disabling script iteration counting of images created or removed. Example: ' . "'--script-verbose'" . ' is an optional parameter which defaults to false',
-                                       'script-verbose-level' => 'Use only with ' . "'--script-verbose'" . ' parameter to see more of execution internals. Example: ' . "'--script-verbose-level=3'" . ' is an optional parameter which defaults to 1'),
+                                       'script-verbose-level' => 'Use only with ' . "'--script-verbose'" . ' parameter to see more of execution internals. Example: ' . "'--script-verbose-level=3'" . ' is an optional parameter which defaults to 1 and works till 5'),
                                 false,
                                 array( 'user' => true ) );
 $script->initialize();
@@ -61,7 +62,7 @@ $user->loginCurrent();
 
 /** Test for required script arguments **/
 
-if ( $options['parent-node'] )
+if ( isset( $options['parent-node'] ) )
 {
     $parentNodeID = $options['parent-node'];
 }
@@ -77,7 +78,7 @@ if ( !is_numeric( $parentNodeID ) )
     $script->shutdown( 2 );
 }
 
-if ( $options['hours'] )
+if ( isset( $options['hours'] ) && $options['hours'] )
 {
     $hoursAgo = $options['hours'];
 }
@@ -92,6 +93,21 @@ if ( !is_numeric( $hoursAgo ) )
     $script->shutdown( 2 );
 }
 
+if ( isset( $options['min'] ) && $options['min'] )
+{
+    $minsAgo = $options['min'];
+}
+else
+{
+    $minsAgo = 2.5;
+}
+
+if ( !is_numeric( $minsAgo ) )
+{
+    $cli->error( 'Please specify a numeric minute number' );
+    $script->shutdown( 2 );
+}
+
 $verbose = isset( $options['script-verbose'] ) ? true : false;
 
 $scriptVerboseLevel = isset( $options['script-verbose-level'] ) ? $options['script-verbose-level'] : 1;
@@ -100,7 +116,36 @@ $troubleshoot = ( isset( $options['script-verbose-level'] ) && $options['script-
 
 /** Modified time stamp to search with **/
 
-$modifiedTimeStamp = time() - ( $hoursAgo * 3600 );
+if( isset( $options['min'] ) && !isset( $options['hours'] ) )
+{
+    /** Optional debug output **/
+
+    if( $troubleshoot && $scriptVerboseLevel >= 5 )
+    {
+        $cli->output( "Searching: Using minutes to search: " . $minsAgo . "\n");
+    }
+    $modifiedTimeStamp = time() - ( $minsAgo * 60 );
+}
+elseif( isset( $options['min'] ) && isset( $options['hours'] ) )
+{
+    /** Optional debug output **/
+
+    if( $troubleshoot && $scriptVerboseLevel >= 5 )
+    {
+        $cli->output( "Searching: Using hours and minutes to search: " . $hoursAgo . ' Hours and ' . $minsAgo . " Minutes\n");
+    }
+    $modifiedTimeStamp = time() - ( ( $hoursAgo * 3600 ) + ( $minsAgo * 60 ) );
+}
+else
+{
+    /** Optional debug output **/
+
+    if( $troubleshoot && $scriptVerboseLevel >= 5 )
+    {
+        $cli->output( "Searching: Using hours to search: " . $hoursAgo . "\n");
+    }
+    $modifiedTimeStamp = time() - ( $hoursAgo * 3600 );
+}
 
 /** Fetch total files count from content tree **/
 
@@ -112,24 +157,58 @@ $subTreeCountByNodeIDParams = array( 'ClassFilterType' => 'include',
                                      'MainNodeOnly', true,
                                      'IgnoreVisibility', true );
 
+/** Optional debug output **/
+
+if( $troubleshoot && $scriptVerboseLevel >= 5 )
+{
+    $cli->output( "S3 File object search params: \n");
+    $cli->output( print_r( $subTreeCountByNodeIDParams ) );
+}
+
+/** Fetch for recently modified AWS S3 File content objects **/
+
 $totalFileCount = eZContentObjectTreeNode::subTreeCountByNodeID( $subTreeCountByNodeIDParams, $parentNodeID );
 
 /** Debug verbose output **/
 
 if( $verbose )
 {
-    $cli->output( "Found! Total File Objects To Be Renamed: " . $totalFileCount . "\n" );
+    if( $totalFileCount > 0 )
+    {
+        $cli->output( "Found! Modified S3 File objects to be checked: " . $totalFileCount . "\n" );
+    }
 }
 
 if ( !$totalFileCount )
 {
-    $cli->error( "No nodes to rename with ParentNodeID: $parentNodeID" );
+    $cli->error( "No S3 File objects to be renamed with ParentNodeID: $parentNodeID" );
     $script->shutdown( 3 );
+}
+
+/** User notification of search period calculations **/
+
+if( isset( $options['min'] ) && !isset( $options['hours'] ) )
+{
+    $whileAgo = $minsAgo;
+    $whileSpan = 'Minutes';
+}
+elseif( isset( $options['min'] ) && isset( $options['hours'] ) )
+{
+    $whileAgo = $hoursAgo . "' Hours and '" . $minsAgo;
+    $whileSpan = 'Minutes';
+}
+else
+{
+    $whileAgo = $hoursAgo;
+    $whileSpan = 'Hours';
 }
 
 /** Alert user of script process starting **/
 
-$cli->output( "Searching content tree from starting node '$parentNodeID' to find S3 large file objects to be processed ...\n" );
+if( $verbose )
+{
+    $cli->output( "Querying content tree for S3 large file objects from starting node '$parentNodeID' for changes in the last '$whileAgo' $whileSpan ...\n" );
+}
 
 /** Setup script iteration details **/
 
@@ -141,6 +220,7 @@ $script->resetIteration( $totalFileCount );
 while ( $offset < $totalFileCount )
 {
     /** Fetch nodes under starting node in content tree **/
+
     $subTreeByNodeIDParams = array( 'ClassFilterType' => 'include',
                                     'ClassFilterArray' => array( $fetchClassIdentifier ),
                                     'AttributeFilter' => array( 'and', array( 'modified','>=', $modifiedTimeStamp ),
@@ -152,14 +232,28 @@ while ( $offset < $totalFileCount )
                                     'MainNodeOnly', true,
                                     'IgnoreVisibility', true );
 
+    /** Optional debug output **/
+
+    if( $troubleshoot && $scriptVerboseLevel >= 5 )
+    {
+        $cli->output( "S3 File object fetch params: \n");
+        $cli->output( print_r( $subTreeByNodeIDParams ) );
+    }
+
+    /** Fetch nodes with limit and offset **/
+
     $subTree = eZContentObjectTreeNode::subTreeByNodeID( $subTreeByNodeIDParams, $parentNodeID );
 
     /** Optional debug output **/
 
-    if( $troubleshoot && $scriptVerboseLevel >= 3 )
+    if( $troubleshoot && $scriptVerboseLevel >= 4 )
     {
-        $cli->output( "Subtree Count: ". count( $subTree ) ."\n" );
-        $cli->output( print_r( $subTree ) );
+        $cli->output( "S3 File objects fetched: ". count( $subTree ) ."\n" );
+
+        if( $troubleshoot && $scriptVerboseLevel >= 6 )
+        {
+            $cli->output( print_r( $subTree ) );
+        }
     }
 
     /** Iterate over nodes **/
@@ -192,11 +286,11 @@ while ( $offset < $totalFileCount )
 
             /** Debug verbose output **/
 
-            if( $verbose )
+            if( $troubleshoot && $scriptVerboseLevel >= 3 )
             {
-                $cli->output( "Found! S3 File needing to be renamed: " . $object->name() . "\n" );
-                $cli->output( "Current Path Name: " . $nodePathName . "\n" );
-                $cli->output( "Past Path Name: " . $nodePastPathName . "\n\n" );
+                $cli->output( "Found! S3 File object pending rename: " . $childNode->attribute('url') . "\n" );
+                $cli->output( "Last Version Path: " . $nodePastPathName . "" );
+                $cli->output( "Current Path: " . $nodePathName . "\n" );
             }
 
             /** Only iterate over versions of nodes path attributes which do not match **/
@@ -215,8 +309,7 @@ while ( $offset < $totalFileCount )
                                   'filename' => $nodePastPathName ),
                             array(// Destination
                                   'bucket' => $awsS3Bucket,
-                                  'filename' => $nodePathName )
-                );
+                                  'filename' => $nodePathName ) );
 
                 /** Only delete old s3 file object if copy is a success **/
 
@@ -244,7 +337,7 @@ while ( $offset < $totalFileCount )
 
                         if( $verbose )
                         {
-                            $cli->output( "Delete Object on AWS S3 Successfull. '$nodePastPathName'\n");
+                            $cli->output( "Success: Deletion of AWS S3 File object. Path: '$nodePastPathName'\n");
                         }
 
                         /** Only modify object if s3 file has been renamed Publish new object with renamed attribute checked **/
@@ -272,16 +365,23 @@ while ( $offset < $totalFileCount )
 
                     if( $verbose )
                     {
-                        $cli->output( "Failure! S3 File failed to be renamed: " . $object->name() . "\n" );
-                        $cli->output( "Current Path Name: " . $nodePathName . "\n" );
-                        $cli->output( "Past Path Name: " . $nodePastPathName . "\n\n" );
+                        $cli->output( "Failure! S3 File object failed to be renamed: " . $childNode->attribute('url') . "\n" );
+                        $cli->output( "S3 File object last version path: " . $nodePastPathName . "" );
+                        $cli->output( "S3 File object current path: " . $nodePathName . "\n" );
+
+                        /** Catch error, 404 file not found **/
+
+                        if( $response->status == 404 )
+                        {
+                            $cli->output( "Reason: S3 File object copy failed because " . $nodePastPathName . " no longer exists\n" );
+                        }
                     }
 
                     /** Optional debug output **/
 
                     if( $troubleshoot && $scriptVerboseLevel >= 3 )
                     {
-                        $cli->output( "Copy Object Responce: \n" . print_r( $response ) );
+                        $cli->output( "Copy S3 File object response: \n" . print_r( $response ) );
                     }
 
                 }
