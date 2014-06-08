@@ -1,2 +1,6 @@
 eZ S3 Upload extension FAQ
 
+Error: Unexpected error, the message was : No credentials were provided. The SDK attempts to retrieve Instance Profile credentials from the EC2 Instance Metadata Service, but doing this requires the "default_cache_config" option to be set in the config.inc.php file or constructor. In order to cache the retrieved credentials. in /var/www/freshfromflorida/ezpublish_legacy/extension/ezs3upload/classes/aws-sdk/sdk.class.php on line 369
+
+Solution: Copy extension/ezs3upload/classes/aws-sdk/config-sample.inc.php to extension/ezs3upload/classes/aws-sdk/config.inc.php and populate AWS Key and SecretKey in config file
+

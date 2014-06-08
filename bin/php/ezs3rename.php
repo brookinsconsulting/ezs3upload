@@ -6,7 +6,7 @@
  * @copyright Copyright (C) 1999 - 2015 Brookins Consulting. All rights reserved.
  * @copyright Copyright (C) 2013 - 2015 Think Creative. All rights reserved.
  * @license http://www.gnu.org/licenses/gpl-2.0.txt GNU General Public License v2 (or later)
- * @version 0.1.0
+ * @version 0.1.1
  * @package ezps3upload
  */
 
@@ -25,7 +25,7 @@ require 'autoload.php';
 /** Script startup and initialization **/
 
 $cli = eZCLI::instance();
-$script = eZScript::instance( array( 'description' => ( "eZ Publish AWS S3 Rename Script\n" .
+$script = eZScript::instance( array( 'description' => ( "eZ Publish AWS S3 Upload Rename Script\n" .
                                                         "\n" .
                                                         "ezs3rename.php --parent-node=2 --hours=1 --min=15" ),
                                      'use-session' => false,
@@ -73,7 +73,7 @@ if ( isset( $options['parent-node'] ) )
 }
 else
 {
-    $cli->error( 'Parent NodeID is required. Specify a content treee node in the command' );
+    $cli->error( '--parent-node parameter is required. Specify a content treee node id' );
     $script->shutdown( 1 );
 }
 
@@ -188,7 +188,11 @@ if( $verbose )
 
 if ( !$totalFileCount )
 {
-    $cli->error( "No S3 File objects to be renamed with ParentNodeID: $parentNodeID" );
+    $cli->error( "No S3 File objects found needing rename" );
+
+    /** Call for display of execution time **/
+    executionTimeDisplay( $srcStartTime, $cli );
+
     $script->shutdown( 3 );
 }
 
@@ -225,7 +229,6 @@ elseif( $verbose && $force )
 {
     $cli->output( "Querying content tree for S3 large file objects from starting node '$parentNodeID' modified in the last '$whileAgo' $whileSpan ...\n" );
 }
-
 
 /** Setup script iteration details **/
 
@@ -390,7 +393,7 @@ while ( $offset < $totalFileCount )
 
                         if( $response->status == 404 )
                         {
-                            $cli->output( "Reason: S3 File object copy failed because " . $nodePastPathName . " no longer exists\n" );
+                            $cli->output( "Reason: S3 File object copy failed because file path " . $nodePastPathName . " no longer exists\n" );
                         }
                     }
 
@@ -410,14 +413,20 @@ while ( $offset < $totalFileCount )
     $offset = $offset + count( $subTree );
 }
 
-/** Add a stoping timing point tracking and calculating total script execution time **/
-$srcStopTime = microtime();
-$startTime = next( explode( " ", $srcStartTime ) ) + current( explode( " ", $srcStartTime ) );
-$stopTime = next( explode( " ", $srcStopTime ) ) + current( explode( " ", $srcStopTime ) );
-$executionTime = round( $stopTime - $startTime, 2 );
+/** Display of execution time **/
+function executionTimeDisplay( $srcStartTime, $cli )
+{
+    /** Add a stoping timing point tracking and calculating total script execution time **/
+    $srcStopTime = microtime();
+    $startTime = next( explode( " ", $srcStartTime ) ) + current( explode( " ", $srcStartTime ) );
+    $stopTime = next( explode( " ", $srcStopTime ) ) + current( explode( " ", $srcStopTime ) );
+    $executionTime = round( $stopTime - $startTime, 2 );
 
-/** Alert the user to how long the script execution took place **/
-$cli->output( "This script execution completed in " . $executionTime . " seconds" . ".\n" );
+    /** Alert the user to how long the script execution took place **/
+    $cli->output( "This script execution completed in " . $executionTime . " seconds" . ".\n" );
+}
+/** Call for display of execution time **/
+executionTimeDisplay( $srcStartTime, $cli );
 
 /** Shutdown script **/
 $script->shutdown();
