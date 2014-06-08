@@ -1,9 +1,9 @@
 <?php
 
 [CronjobSettings]
-ExtensionDirectories[]=site
+ExtensionDirectories[]=ezs3upload
 
 [CronjobPart-rename_aws_s3_files]
-Scripts[]=amazonrename.php
+Scripts[]=ezs3rename.php
 
 ?>

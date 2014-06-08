@@ -14,7 +14,7 @@ $hoursAgo = eZINI::instance( 's3.ini' )->variable( 'S3Settings', 'HoursAgo' );
 
 // General cronjob part options
 $phpBin = '/usr/bin/php -d memory_limit=-1 ';
-$generatorWorkerScript = 'extension/ezs3upload/bin/php/ezps3rename.php';
+$generatorWorkerScript = 'extension/ezs3upload/bin/php/ezs3rename.php';
 $options = '--parent-node=' . $parentNodeID . ' --hours=' . $hoursAgo;
 $result = false;
 

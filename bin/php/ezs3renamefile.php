@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 /**
- * File containing the ezs3rename.php bin script
+ * File containing the ezs3renamefile.php bin script
  *
  * @copyright Copyright (C) 1999 - 2015 Brookins Consulting. All rights reserved.
  * @copyright Copyright (C) 2013 - 2015 Think Creative. All rights reserved.
