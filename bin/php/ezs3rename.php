@@ -125,6 +125,9 @@ $troubleshoot = ( isset( $options['script-verbose-level'] ) && $options['script-
 
 if( isset( $options['min'] ) && !isset( $options['hours'] ) )
 {
+    $whileAgo = $minsAgo;
+    $whileSpan = 'Minutes';
+
     /** Optional debug output **/
 
     if( $troubleshoot && $scriptVerboseLevel >= 5 )
@@ -135,6 +138,9 @@ if( isset( $options['min'] ) && !isset( $options['hours'] ) )
 }
 elseif( isset( $options['min'] ) && isset( $options['hours'] ) )
 {
+    $whileAgo = $hoursAgo . "' Hours and '" . $minsAgo;
+    $whileSpan = 'Minutes';
+
     /** Optional debug output **/
 
     if( $troubleshoot && $scriptVerboseLevel >= 5 )
@@ -145,6 +151,9 @@ elseif( isset( $options['min'] ) && isset( $options['hours'] ) )
 }
 else
 {
+    $whileAgo = $hoursAgo;
+    $whileSpan = 'Hours';
+
     /** Optional debug output **/
 
     if( $troubleshoot && $scriptVerboseLevel >= 5 )
@@ -178,14 +187,6 @@ $totalFileCount = eZContentObjectTreeNode::subTreeCountByNodeID( $totalFileCount
 
 /** Debug verbose output **/
 
-if( $verbose )
-{
-    if( $totalFileCount > 0 )
-    {
-        $cli->warning( "Found! Modified S3 File objects to be checked: " . $totalFileCount . "\n" );
-    }
-}
-
 if ( !$totalFileCount )
 {
     $cli->error( "No S3 File objects found needing rename" );
@@ -195,23 +196,9 @@ if ( !$totalFileCount )
 
     $script->shutdown( 3 );
 }
-
-/** User notification of search period calculations **/
-
-if( isset( $options['min'] ) && !isset( $options['hours'] ) )
+elseif( $verbose && $totalFileCount > 0 )
 {
-    $whileAgo = $minsAgo;
-    $whileSpan = 'Minutes';
-}
-elseif( isset( $options['min'] ) && isset( $options['hours'] ) )
-{
-    $whileAgo = $hoursAgo . "' Hours and '" . $minsAgo;
-    $whileSpan = 'Minutes';
-}
-else
-{
-    $whileAgo = $hoursAgo;
-    $whileSpan = 'Hours';
+    $cli->warning( "Found! Modified S3 File objects to be checked: " . $totalFileCount . "\n" );
 }
 
 /** Alert user of script process starting **/
