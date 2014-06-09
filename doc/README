@@ -23,8 +23,8 @@ Last Major update: June 1, 2013
 eZ S3 Upload Rename version
 =======================
 
-The current version of eZ S3 Upload Client is 0.1.1
-Last major update: June 8, 2014
+The current version of eZ S3 Upload Client is 0.1.2
+Last major update: June 9, 2014
 
 
 Copyright
@@ -144,11 +144,11 @@ Usage of aws s3 file rename support
 
 - Edit your aws s3 file content object class and add a checkbox with the content class identifier attribute of 'aws_s3_renamed'. Required by rename script. Identifier implemented as s3.ini setting.
 
-- Publish a new version of a aws s3 file enabled class object with a s3 reference path change.
+- Publish a new version of a aws s3 file enabled class object with a s3 reference path change and uncheck the 'aws_s3_renamed' attribute checkbox.
 
 - Run command line script or cronjob.
 
--- Script: /usr/bin/php -d memory_limit=-1 ./extension/ezs3upload/bin/php/ezs3rename.php --parent-node=2 --min=15 --script-verbose=true --script-verbose-level=2
+-- Script: /usr/bin/php -d memory_limit=-1 ./extension/ezs3upload/bin/php/ezs3rename.php --parent-node=2 --min=15 --script-verbose=true --script-verbose-level=2 --force
 
 -- Cronjob: /usr/bin/php -d memory_limit=-1 ./runcronjobs.php rename_aws_s3_files
 
