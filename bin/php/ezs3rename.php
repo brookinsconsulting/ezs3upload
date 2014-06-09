@@ -398,6 +398,11 @@ while ( $offset < $totalFileCount )
 
                 }
             }
+            else
+            {
+                /** Iterate cli script progress tracker **/
+                $script->iterate( $cli, $status );
+            }
         }
     }
 
