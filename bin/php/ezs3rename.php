@@ -156,25 +156,25 @@ else
 
 /** Fetch total files count from content tree **/
 
-$subTreeCountByNodeIDParams = array( 'ClassFilterType' => 'include',
-                                     'ClassFilterArray' => array( $s3FileClassIdentifier ),
-                                     'AttributeFilter' => array( 'and', array( 'modified','>=', $searchTimeStampInSeconds ),
-                                                                        array( "large_file/$s3FileRenameAttributeIdentifier",'!=', true ) ),
-                                     'Depth', 5,
-                                     'MainNodeOnly', true,
-                                     'IgnoreVisibility', true );
+$totalFileCountParams = array( 'ClassFilterType' => 'include',
+                               'ClassFilterArray' => array( $s3FileClassIdentifier ),
+                               'AttributeFilter' => array( 'and', array( 'modified','>=', $searchTimeStampInSeconds ),
+                                                                  array( "large_file/$s3FileRenameAttributeIdentifier",'!=', true ) ),
+                               'Depth', 5,
+                               'MainNodeOnly', true,
+                               'IgnoreVisibility', true );
 
 /** Optional debug output **/
 
 if( $troubleshoot && $scriptVerboseLevel >= 5 )
 {
     $cli->output( "S3 File object search params: \n");
-    $cli->output( print_r( $subTreeCountByNodeIDParams ) );
+    $cli->output( print_r( $totalFileCountParams ) );
 }
 
 /** Fetch total count for recently modified AWS S3 File content objects **/
 
-$totalFileCount = eZContentObjectTreeNode::subTreeCountByNodeID( $subTreeCountByNodeIDParams, $parentNodeID );
+$totalFileCount = eZContentObjectTreeNode::subTreeCountByNodeID( $totalFileCountParams, $parentNodeID );
 
 /** Debug verbose output **/
 
@@ -263,12 +263,13 @@ while ( $offset < $totalFileCount )
     /** Fetch nodes with limit and offset **/
 
     $subTree = eZContentObjectTreeNode::subTreeByNodeID( $subTreeParams, $parentNodeID );
+    $subTreeCount = count( $subTree );
 
     /** Optional debug output **/
 
     if( $troubleshoot && $scriptVerboseLevel >= 4 )
     {
-        $cli->output( "S3 File objects fetched: ". count( $subTree ) ."\n" );
+        $cli->output( "S3 File objects fetched: ". $subTreeCount ."\n" );
 
         if( $troubleshoot && $scriptVerboseLevel >= 6 )
         {
@@ -414,7 +415,7 @@ while ( $offset < $totalFileCount )
     }
 
     /** Iterate fetch function offset and continue **/
-    $offset = $offset + count( $subTree );
+    $offset = $offset + $subTreeCount;
 }
 
 /** Display of execution time **/
