@@ -332,7 +332,7 @@ while ( $offset < $totalFileCount )
 
                     if( $verbose )
                     {
-                        $cli->output( "Success: AWS S3 File object path copied. New path: '$objectPathName'\n");
+                        $cli->output( "Success: Copy of AWS S3 File object path. New path: '$objectPathName'\n");
                     }
 
                     $delete = $awsS3->delete_object( $awsS3Bucket, $objectPastPathName );
@@ -365,7 +365,7 @@ while ( $offset < $totalFileCount )
 
                         if( $verbose )
                         {
-                            $cli->output( "Publishing new large_file object version with $s3FileRenameAttributeIdentifier attribute checked\n");
+                            $cli->output( "Publishing new S3 File object version with $s3FileRenameAttributeIdentifier attribute checked\n");
                         }
 
                         /** Iterate cli script progress tracker **/
@@ -378,14 +378,37 @@ while ( $offset < $totalFileCount )
 
                     if( $verbose )
                     {
-                        $cli->error( "Failure! S3 File object failed to be renamed: " . $nodeUrl . ", NodeID " . $nodeID . "\n" );
-                        $cli->error( "S3 File object copy from: " . $objectPastPathName . " to " . $objectPathName .  " failed\n" );
+                        $errorMsgAlert = "Failure! S3 File object failed to be renamed: " . $nodeUrl . ", NodeID " . $nodeID . "\n";
+                        $cli->error( $errorMsgAlert );
+                        eZDebug::writeError( $errorMsgAlert );
+
+                        $errorMsg = "S3 File object copy from: " . $objectPastPathName . " to " . $objectPathName .  " failed\n";
+                        $cli->error( $errorMsg );
+                        eZDebug::writeError( $errorMsg );
 
                         /** Catch error, 404 file not found **/
 
                         if( $response->status == 404 )
                         {
-                            $cli->warning( "Reason: S3 File object copy failed because file path " . $objectPastPathName . " no longer exists\n" );
+                            $warningMsg = "Reason: S3 File object copy failed because file path " . $objectPastPathName . " no longer exists\n";
+                            $cli->warning( $warningMsg );
+                            eZDebug::writeError( $warningMsg );
+                        }
+                    }
+                    else
+                    {
+                        $errorMsgAlert = "Failure! S3 File object failed to be renamed: " . $nodeUrl . ", NodeID " . $nodeID . "\n";
+                        eZDebug::writeError( $errorMsgAlert );
+
+                        $errorMsg = "S3 File object copy from: " . $objectPastPathName . " to " . $objectPathName .  " failed\n";
+                        eZDebug::writeError( $errorMsg );
+
+                        /** Catch error, 404 file not found **/
+
+                        if( $response->status == 404 )
+                        {
+                            $warningMsg = "Reason: S3 File object copy failed because file path " . $objectPastPathName . " no longer exists\n";
+                            eZDebug::writeError( $warningMsg );
                         }
                     }
 
