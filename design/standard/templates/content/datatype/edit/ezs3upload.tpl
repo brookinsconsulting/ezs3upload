@@ -239,7 +239,8 @@ var txtezpFieldFileName = document.getElementById("{/literal}ezcoa-{if ne( $attr
                 //FORM SUBMIT document.forms[0].submit();
 
                 var txtezpFieldFileName = document.getElementById("{/literal}ezcoa-{if ne( $attribute_base, 'ContentObjectAttribute' )}{$attribute_base}-{/if}{$attribute.contentclassattribute_id}_{$attribute.contentclass_attribute_identifier}{literal}");
-                txtezpFieldFileName.value = txtezpFieldFileName.value + document.getElementById("txtFileName").value;
+                var txtezpFieldRootName = document.getElementById("{/literal}ezcoa-{if ne( $attribute_base, 'ContentObjectAttribute' )}{$attribute_base}-{/if}0_{$attribute.contentclass_attribute_identifier}{literal}");
+                txtezpFieldFileName.value = txtezpFieldRootName.value + document.getElementById("txtFileName").value;
 
                 var txtFileName = document.getElementById("txtFileName");
                 txtFileName.value = '';
