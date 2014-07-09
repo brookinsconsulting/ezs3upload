@@ -40,12 +40,13 @@ var successURL = null;
 
 $(function(){
 
-var txtezpFieldFileName = document.getElementById("{/literal}ezcoa-{if ne( $attribute_base, 'ContentObjectAttribute' )}{$attribute_base}-{/if}{$attribute.contentclassattribute_id}_{$attribute.contentclass_attribute_identifier}{literal}");
+var txtezpFieldRootName = document.getElementById("{/literal}ezcoa-{if ne( $attribute_base, 'ContentObjectAttribute' )}{$attribute_base}-{/if}0_{$attribute.contentclass_attribute_identifier}{literal}");
+// var txtezpFieldFileName = document.getElementById("{/literal}ezcoa-{if ne( $attribute_base, 'ContentObjectAttribute' )}{$attribute_base}-{/if}{$attribute.contentclassattribute_id}_{$attribute.contentclass_attribute_identifier}{literal}");
 
     $('#swfupload-control').swfupload({
 {/literal}
         upload_url: "http://{$aws_s3_bucket}.s3.amazonaws.com/",
-        post_params: {literal}{{/literal}"AWSAccessKeyId":"{$aws_access_key_id}", "key":{literal}txtezpFieldFileName.value + "${filename}"{/literal}, "acl":"public-read", "policy":"{$policyDoc64}", "signature":"{$sigPolicyDoc}","success_action_status":"201", "content-type":"image/"{literal}}{/literal},
+        post_params: {literal}{{/literal}"AWSAccessKeyId":"{$aws_access_key_id}", "key":{literal}txtezpFieldRootName.value + "${filename}"{/literal}, "acl":"public-read", "policy":"{$policyDoc64}", "signature":"{$sigPolicyDoc}","success_action_status":"201", "content-type":"image/"{literal}}{/literal},
 
         http_success : [201],
         assume_success_timeout : {if $is_mac_user|eq( true() )}5{else}0{/if},
