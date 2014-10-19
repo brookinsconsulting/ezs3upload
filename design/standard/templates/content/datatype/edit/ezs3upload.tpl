@@ -306,12 +306,15 @@ Root Path: <input id="ezcoa-{if ne( $attribute_base, 'ContentObjectAttribute' )}
 <div id="content">
     {* <form id="s3FileUploadForm" action="#" enctype="multipart/form-data" method="post"> *}
         <div class="fieldset">
-            <table style="vertical-align:top;">
-                <tr style="background: none;">
+            <table>
+                <tr>
                     <td>
                         <div>
                             <div>
-                                <div id="swfupload-control" style="display:inline; position: relative; top: -8px;"><input type="button" id="mybutton" />&nbsp;&nbsp;</div><div id="fsUploadProgress2" style="display:inline; position: relative; top: -19px;"></div><input type="text" id="txtFileName" disabled="true" style="display:inline; position: relative; top: -19px; border: solid 1px; background-color: #FFFFFF;" />&nbsp;<input type="submit" value="Upload" id="btnSubmit" style="position: relative; top: -14px; font-weight: bold; font-size: 2.0em" />
+                                <div id="swfupload-control"><input type="button" id="mybutton" /></div>
+                                <div id="fsUploadProgress2"></div>
+                                <input type="text" id="txtFileName" disabled="true" />
+                                <input type="submit" value="Upload" id="btnSubmit" />
                             </div>
                             {* <!-- This is the container that the upload progress elements will be added to --> *}
 

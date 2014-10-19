@@ -7,7 +7,7 @@
 div.fieldset {
     border:  1px solid #afe14c;
     margin: 10px 0;
-    padding: 20px 10px;
+    padding: 20px 10px 0px;
 }
 div.fieldset span.legend {
     position: relative;
@@ -20,7 +20,7 @@ div.fieldset span.legend {
 
 div.flash {
     width: 375px;
-    margin: 10px 5px;
+    margin: 10px 0px;
     border-color: #D9E4FF;
 
     -moz-border-radius-topleft : 5px;
@@ -36,13 +36,21 @@ div.flash {
 
 /* -- Table Styles ------------------------------- */
 
+div.fieldset table {
+    vertical-align: top;
+}
+
+div.fieldset table tr {
+    background: none;
+}
+
 .progressWrapper {
     width: 357px;
     overflow: hidden;
 }
 
 .progressContainer {
-    margin: 5px;
+    margin: 5px 0px;
     padding: 4px;
     border: solid 1px #E8E8E8;
     background-color: #F7F7F7;
@@ -136,3 +144,41 @@ a.progressCancel:hover {
 .swfupload {
     vertical-align: top;
 }
+
+#swfupload-control {
+    display: inline;
+    position: relative;
+    top: -8px;
+}
+
+#fsUploadProgress2 {
+    display: inline;
+    position: relative;
+    top: -7px;
+    left: 4px;
+}
+
+#txtFileName {
+    display: inline;
+    position: relative;
+    width: 400px;
+    top: -6px;
+    left: 6px;
+    border: solid 1px;
+    background-color: #FFFFFF;
+}
+
+#btnSubmit {
+    -webkit-appearance: button;
+    display: block;
+    position: relative;
+    top: 0px;
+    font-weight: normal;
+    font-size: 1.4em;
+    width: 61px;
+    text-align: left;
+    padding: 0px;
+    height: 22px;
+}
+
+/* end */
